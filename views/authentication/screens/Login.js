@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import auth from '@react-native-firebase/auth';
 import { StyleSheet } from 'react-native';
+
+import * as RootNavigation from '../../../navigation/RootNavigation';
+
 import {
     Layout,
     Text,
@@ -8,14 +11,20 @@ import {
 } from '@ui-kitten/components';
 
 import TextInput from '../../../components/Form/TextInput';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../redux/actions';
 
 const Login = () => {
 
     const [inputs, setInputs] = useState({ email: '', password: '' });
 
+    const dispatch = useDispatch();
+
     const loginHandler = async () => {
         try {
             await auth().signInWithEmailAndPassword(inputs.email, inputs.password);
+            dispatch(loginSuccess());
+            RootNavigation.navigate('Home');
         } catch (e) {
             console.log(e.message);
         }

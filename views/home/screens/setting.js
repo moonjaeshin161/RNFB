@@ -2,17 +2,17 @@ import React from 'react';
 import { Button } from '@ui-kitten/components';
 import { useDispatch } from 'react-redux';
 import auth from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
+
+import * as RootNavigation from '../../../navigation/RootNavigation';
 
 import { logOutSuccess } from '../../authentication/redux/actions';
 
 const Setting = () => {
     const dispatch = useDispatch();
-    const navigation = useNavigation();
     const signOutHandler = async () => {
         auth().signOut().then(function () {
             dispatch(logOutSuccess());
-            navigation.navigate('Login');
+            RootNavigation.navigate('Login')
         }).catch(function (error) {
             // An error happened.
         });
