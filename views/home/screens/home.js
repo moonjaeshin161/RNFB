@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
+
+import * as RootNavigation from '../../../navigation/RootNavigation';
+import { useDispatch } from 'react-redux';
+import { getUserInfo } from '../../user/redux/actions';
 
 const Home = () => {
-
-    const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState({ email: '' });
-
-    const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     function onAuthStateChanged(user) {
         setUser(user);
-        if (initializing) setInitializing(false);
+        dispatch(getUserInfo(user));
     }
     useEffect(() => {
-        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-        return subscriber;
+        auth().onAuthStateChanged(onAuthStateChanged);
     }, []);
 
-    if (initializing) return null;
-
     if (!user) {
-        navigation.navigate('Login');
+        RootNavigation.navigate('Login');
     }
     return (
         <View>

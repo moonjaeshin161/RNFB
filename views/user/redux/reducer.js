@@ -1,10 +1,12 @@
+import { types } from "./actions";
+
 const initialState = {
-    test: 1
+    user: {}
 }
 
 const UserReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'TEST': return { ...state };
+        case types.GET_USER_INFO: return { ...state, user: action.payload };
         default: return { ...state }
     }
 }
