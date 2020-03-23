@@ -4,17 +4,23 @@ import { StyleSheet } from 'react-native'
 import TextInput from '../../../components/Form/TextInput'
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { getUserInfo, updateUserInfo } from '../redux/actions';
 
 const EditProfile = ({ route }) => {
     const user = route.params;
+
     const [inputs, setInputs] = useState();
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     const editHandler = async () => {
-        console.log(inputs)
-        console.log(auth().currentUser);
-        await auth().currentUser.updateProfile(inputs);
-        navigation.goBack();
+        const currentUser = auth().currentUser;
+        currentUser.updateProfile(inputs)
+            .then(() => {
+                dispatch(updateUserInfo(inputs));
+                navigation.goBack();
+            })
     }
 
     return (

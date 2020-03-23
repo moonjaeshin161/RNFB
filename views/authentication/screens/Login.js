@@ -13,12 +13,14 @@ import {
 import TextInput from '../../../components/Form/TextInput';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/actions';
+import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
 
     const [inputs, setInputs] = useState({ email: '', password: '' });
 
     const dispatch = useDispatch();
+    const navigation = useNavigation();
 
     const loginHandler = async () => {
         try {
@@ -28,6 +30,10 @@ const Login = () => {
         } catch (e) {
             console.log(e.message);
         }
+    }
+
+    const navigateHandler = () => {
+        navigation.navigate('Register');
     }
 
     return (
@@ -53,6 +59,9 @@ const Login = () => {
                     inputs={inputs}
                 />
                 <Button onPress={loginHandler}>Login</Button>
+                <Text category='p2' onPress={navigateHandler}>
+                    Didn't have account - Sign Up for now
+                </Text>
             </Layout>
 
         </Layout>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import {
     Layout,
@@ -7,19 +8,46 @@ import {
     Button,
 } from '@ui-kitten/components';
 
-
 import TextInput from '../../../components/Form/TextInput';
+import * as RootNavigation from '../../../navigation/RootNavigation';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../redux/actions';
+import { getUserInfo } from '../../user/redux/actions';
 
 const Register = () => {
 
-    const [inputs, setInputs] = useState({ username: '', email: '', password: '' });
+    const [inputs, setInputs] = useState({ displayName: '', email: '', password: '' });
+
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     const registerHandler = async () => {
         try {
-            await auth().createUserWithEmailAndPassword(inputs.email, inputs.password);
+            auth().createUserWithEmailAndPassword(inputs.email, inputs.password)
+                .then(() => {
+                    const user = auth().currentUser;
+                    if (user) {
+                        user.updateProfile({
+                            displayName: inputs.displayName
+                        })
+                            .then(() => {
+                                console.log(user);
+                                dispatch(loginSuccess());
+                                dispatch(getUserInfo(user));
+                                RootNavigation.navigate('Home');
+                            })
+
+                    }
+                })
+
+
         } catch (e) {
             console.log(e.message);
         }
+    }
+
+    const navigateHandler = () => {
+        navigation.navigate('Login');
     }
 
     return (
@@ -31,6 +59,12 @@ const Register = () => {
 
             <Layout style={styles.form}>
                 <TextInput
+                    placeholder='Your display name'
+                    value={inputs.displayName}
+                    name='displayName'
+                    setInputs={setInputs}
+                    inputs={inputs}
+                /><TextInput
                     placeholder='Your Email'
                     value={inputs.email}
                     name='email'
@@ -45,6 +79,7 @@ const Register = () => {
                     inputs={inputs}
                 />
                 <Button onPress={registerHandler}>Register</Button>
+                <Text category='p2' onPress={navigateHandler}>Already have account - Let's Login</Text>
             </Layout>
 
         </Layout>
