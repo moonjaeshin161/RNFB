@@ -14,6 +14,9 @@ const Profile = () => {
 
     return (
         <Layout style={styles.container}>
+            {
+                console.log('Profile Screen: ', user)
+            }
             <Text category='h3'>{`${user.displayName}'s profile`}</Text>
             <Button onPress={editHandler}>Edit</Button>
         </Layout>

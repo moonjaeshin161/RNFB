@@ -1,19 +1,43 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
-export const createUser = async (user) => {
-    try {
-        await auth().createUserWithEmailAndPassword(user.email, user.password);
-        await auth().currentUser.updateProfile({
-            displayName: user.displayName
-        })
-        await firestore()
-            .collection('users')
-            .add({
-                email: user.email,
-                displayName: user.displayName
-            })
-    } catch (e) {
-        console.log(e.message);
-    }
+const uid = (auth().currentUser || {}).uid;
+
+export const uploadPhoto = async (uri) => {
+    const fileExtension = await uri.split('.').pop();
+    console.log('EXT: ', fileExtension);
+    console.log('UID: ', uid);
+    const fileName = `${uid}.${fileExtension}`;
+    console.log('Filename: ', fileName);
+
+    const storageRef = storage().ref(`users/avatar/${fileName}`);
+
+    storageRef.putFile(uri)
+        .on(
+            storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+                console.log('Snapshot: ', snapshot.state);
+
+                if (snapshot.state === storage.TaskState.SUCCESS) {
+                    console.log('Success')
+                }
+            },
+            error => {
+                unsubscribe();
+                console.log('Image upload error: ', error.toString());
+            },
+            () => {
+                storageRef.getDownloadURL()
+                    .then(downloadURL => {
+                        console.log('File available at: ', downloadURL);
+                        firestore()
+                            .collection('users')
+                            .doc(uid)
+                            .update({
+                                avatar: downloadURL
+                            })
+                    })
+            }
+        )
 }

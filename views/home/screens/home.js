@@ -12,7 +12,7 @@ const Home = () => {
 
     function onAuthStateChanged(user) {
         setUser(user);
-        dispatch(setUserInfo(user));
+        dispatch(setUserInfo({ email: user.email, displayName: user.displayName }));
     }
     useEffect(() => {
         auth().onAuthStateChanged(onAuthStateChanged);
