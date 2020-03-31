@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { updateUserInfo } from '../redux/actions';
 import ImagePicker from 'react-native-image-picker';
+import { uploadPhoto } from '../../../firebase/service';
 
 import TextInput from '../../../components/Form/TextInput'
 import BigAvatar from '../../../components/Profile/BigAvatar';
@@ -13,37 +14,37 @@ import BigAvatar from '../../../components/Profile/BigAvatar';
 const EditProfile = ({ route }) => {
     const user = route.params;
 
-    const [inputs, setInputs] = useState();
-    const [avatarSource, setAvatarSource] = useState(null);
+    const [inputs, setInputs] = useState({ displayName: '' });
+    const [imageURI, setImageURI] = useState(null);
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
     const editHandler = async () => {
         const currentUser = auth().currentUser;
-        currentUser.updateProfile(inputs)
+        currentUser.updateProfile({ displayName: inputs.displayName, avatar: imageURI })
             .then(() => {
-                dispatch(updateUserInfo(inputs));
+                uploadPhoto(imageURI.uri);
+                dispatch(updateUserInfo({ displayName: inputs.displayName, avatar: imageURI }));
                 navigation.goBack();
             })
     }
 
-    const selectImageHandler = async () => {
-        ImagePicker.showImagePicker({ noData: true, mediaType: 'photo' }, (response) => {
-            console.log('Response = ', response);
+    const pickImageHandler = () => {
+        ImagePicker.showImagePicker({ title: 'Image upload', maxHeight: 800, maxWidth: 600 }
+            , (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                } else {
+                    setImageURI({ uri: response.uri });
+                    // You can also display the image using data:
+                    // const source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                // You can also display the image using data:
-                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                setAvatarSource(response.uri);
-            }
-        });
+                }
+            });
     }
 
     return (
@@ -58,14 +59,14 @@ const EditProfile = ({ route }) => {
             />
 
             {
-                avatarSource &&
+                imageURI &&
                 <BigAvatar
-                    source={{ uri: avatarSource }}
+                    source={imageURI}
                 />
             }
 
             <Button onPress={editHandler}>Edit</Button>
-            <Button onPress={selectImageHandler}>Select Image</Button>
+            <Button onPress={pickImageHandler}>Select Image</Button>
 
         </Layout>
     )

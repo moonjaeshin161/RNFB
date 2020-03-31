@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
+
+//firebase
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {
     Layout,
     Text,
@@ -11,7 +15,6 @@ import {
 import TextInput from '../../../components/Form/TextInput';
 import * as RootNavigation from '../../../navigation/RootNavigation';
 import { loginSuccess } from '../redux/actions';
-import { createUser } from '../../../firebase/service';
 
 const Register = () => {
 
@@ -21,15 +24,29 @@ const Register = () => {
     const dispatch = useDispatch();
 
     const registerHandler = async () => {
-        const user = {
-            displayName: inputs.displayName,
-            email: inputs.email,
-            password: inputs.password
-        }
         try {
-            await createUser(user);
-            dispatch(loginSuccess());
-            RootNavigation.navigate('Home');
+            auth().createUserWithEmailAndPassword(inputs.email, inputs.password)
+                .then(async (user) => {
+                    if (user) {
+                        const currentUser = await auth().currentUser;
+                        await currentUser.updateProfile({
+                            displayName: inputs.displayName
+                        });
+                        await firestore()
+                            .collection('users')
+                            .doc(currentUser.uid)
+                            .set({
+                                email: inputs.email,
+                                displayName: inputs.displayName,
+                            });
+                        dispatch(loginSuccess());
+                        RootNavigation.navigate('Home');
+                    }
+                    else {
+                        alert('Sign up error');
+                    }
+                })
+                .catch(error => console.log('Error: ', error))
         }
         catch (e) {
             console.log(e)
