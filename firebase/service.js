@@ -2,8 +2,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
-const uid = (auth().currentUser || {}).uid;
-
 export const uploadPhoto = async (uri) => {
     const fileExtension = await uri.split('.').pop();
     console.log('EXT: ', fileExtension);
@@ -33,7 +31,7 @@ export const uploadPhoto = async (uri) => {
                         console.log('File available at: ', downloadURL);
                         firestore()
                             .collection('users')
-                            .doc(uid)
+                            .doc(auth().currentUser.uid)
                             .update({
                                 avatar: downloadURL
                             })

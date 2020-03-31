@@ -15,6 +15,7 @@ import {
 import TextInput from '../../../components/Form/TextInput';
 import * as RootNavigation from '../../../navigation/RootNavigation';
 import { loginSuccess } from '../redux/actions';
+import { updateUserInfo } from '../../user/redux/actions';
 
 const Register = () => {
 
@@ -39,6 +40,7 @@ const Register = () => {
                                 email: inputs.email,
                                 displayName: inputs.displayName,
                             });
+                        dispatch(updateUserInfo({ displayName: inputs.displayName }));
                         dispatch(loginSuccess());
                         RootNavigation.navigate('Home');
                     }
