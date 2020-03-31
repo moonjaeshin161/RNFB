@@ -4,7 +4,7 @@ import auth from '@react-native-firebase/auth';
 
 import * as RootNavigation from '../../../navigation/RootNavigation';
 import { useDispatch } from 'react-redux';
-import { getUserInfo } from '../../user/redux/actions';
+import { setUserInfo } from '../../user/redux/actions';
 
 const Home = () => {
     const [user, setUser] = useState({ email: '' });
@@ -12,7 +12,8 @@ const Home = () => {
 
     function onAuthStateChanged(user) {
         setUser(user);
-        dispatch(getUserInfo(user));
+        console.log('Current User: ', user)
+        dispatch(setUserInfo(user));
     }
     useEffect(() => {
         auth().onAuthStateChanged(onAuthStateChanged);

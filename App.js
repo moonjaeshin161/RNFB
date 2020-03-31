@@ -9,7 +9,7 @@ import HomeTab from './navigation/tab/Home';
 import auth from '@react-native-firebase/auth';
 import { loginSuccess } from './views/authentication/redux/actions';
 import { navigationRef } from './navigation/RootNavigation';
-import { getUserInfo } from './views/user/redux/actions';
+import { setUserInfo } from './views/user/redux/actions';
 
 const MainApp = () => {
   const isLogin = useSelector(state => state.auth.isLogin);
@@ -18,7 +18,7 @@ const MainApp = () => {
   const checkCurrentUser = async () => {
     const user = await auth().currentUser;
     if (user) {
-      dispatch(getUserInfo(user));
+      dispatch(setUserInfo(user));
       dispatch(loginSuccess());
     }
   }

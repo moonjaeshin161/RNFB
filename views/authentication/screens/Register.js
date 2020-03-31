@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
 import {
     Layout,
     Text,
@@ -10,9 +10,8 @@ import {
 
 import TextInput from '../../../components/Form/TextInput';
 import * as RootNavigation from '../../../navigation/RootNavigation';
-import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/actions';
-import { getUserInfo } from '../../user/redux/actions';
+import { createUser } from '../../../firebase/service';
 
 const Register = () => {
 
@@ -22,28 +21,20 @@ const Register = () => {
     const dispatch = useDispatch();
 
     const registerHandler = async () => {
-        try {
-            auth().createUserWithEmailAndPassword(inputs.email, inputs.password)
-                .then(() => {
-                    const user = auth().currentUser;
-                    if (user) {
-                        user.updateProfile({
-                            displayName: inputs.displayName
-                        })
-                            .then(() => {
-                                console.log(user);
-                                dispatch(loginSuccess());
-                                dispatch(getUserInfo(user));
-                                RootNavigation.navigate('Home');
-                            })
-
-                    }
-                })
-
-
-        } catch (e) {
-            console.log(e.message);
+        const user = {
+            displayName: inputs.displayName,
+            email: inputs.email,
+            password: inputs.password
         }
+        try {
+            await createUser(user);
+            dispatch(loginSuccess());
+            RootNavigation.navigate('Home');
+        }
+        catch (e) {
+            console.log(e)
+        }
+
     }
 
     const navigateHandler = () => {

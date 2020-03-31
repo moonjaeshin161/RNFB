@@ -1,11 +1,11 @@
 export const types = {
-    GET_USER_INFO: 'GET_USER_INFO',
+    SET_USER_INFO: 'SET_USER_INFO',
     UPDATE_USER_INFO: 'UPDATE_USER_INFO',
 }
 
-export function getUserInfo(user) {
+export function setUserInfo(user) {
     return {
-        type: types.GET_USER_INFO,
+        type: types.SET_USER_INFO,
         payload: user
     }
 }
