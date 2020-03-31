@@ -12,7 +12,6 @@ const Home = () => {
 
     function onAuthStateChanged(user) {
         setUser(user);
-        console.log('Current User: ', user)
         dispatch(setUserInfo(user));
     }
     useEffect(() => {
@@ -25,7 +24,6 @@ const Home = () => {
     return (
         <View>
             <Text>Hello {user.email}</Text>
-
         </View>
     )
 }
