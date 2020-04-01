@@ -1,21 +1,22 @@
 import React, { useState } from 'react'
 import { Layout, Text, Button } from '@ui-kitten/components'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUserInfo } from '../redux/actions';
 import ImagePicker from 'react-native-image-picker';
 import { uploadPhoto } from '../../../firebase/service';
 
 import TextInput from '../../../components/Form/TextInput'
 import BigAvatar from '../../../components/Profile/BigAvatar';
+import { globalStyles } from '../../../shared/globalStyles';
 
-const EditProfile = ({ route }) => {
-    const user = route.params;
+const EditProfile = () => {
+    const user = useSelector(state => state.user.user);
 
     const [inputs, setInputs] = useState({ displayName: '' });
-    const [imageURI, setImageURI] = useState(null);
+    const [imageURI, setImageURI] = useState(require('../../../asserts/images/default-avatar.png'));
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
@@ -48,33 +49,61 @@ const EditProfile = ({ route }) => {
     }
 
     return (
-        <Layout style={styles.container}>
+        <Layout style={globalStyles.container}>
             {console.log('Edit Profile', user)}
-            <Text category='h3'>Edit Profile</Text>
-            <TextInput
-                placeholder={user.displayName}
-                inputs={inputs}
-                setInputs={setInputs}
-                name='displayName'
-            />
+            <Layout style={styles.title}>
+                <Text category='h3'>Profile Editing</Text>
+            </Layout>
+            <Layout style={styles.content}>
+                <Layout>
+                    <TouchableOpacity onPress={pickImageHandler}>
+                        <BigAvatar source={imageURI} />
+                    </TouchableOpacity>
+                </Layout>
+                <Layout style={styles.row}>
+                    <Text
+                        style={styles.label}
+                        category='s1'
+                    >
+                        Displayname</Text>
+                    <TextInput
+                        placeholder={user.displayName}
+                        inputs={inputs}
+                        setInputs={setInputs}
+                        name='displayName'
+                    />
+                </Layout>
 
-            {
-                imageURI &&
-                <BigAvatar
-                    source={imageURI}
-                />
-            }
 
-            <Button onPress={editHandler}>Edit</Button>
-            <Button onPress={pickImageHandler}>Select Image</Button>
+            </Layout>
+            <Layout style={styles.footer}>
+                <Button onPress={editHandler}>Edit</Button>
+            </Layout>
 
         </Layout>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
+    title: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    content: {
+        flex: 6,
+        alignItems: "center"
+    },
+    row: {
+        flex: 1,
+        width: 350,
+    },
+    label: {
+        marginLeft: 15,
+        marginVertical: 10
+    },
+    footer: {
+        flex: 3,
+        marginTop: 10
     }
 })
 
