@@ -16,6 +16,7 @@ import TextInput from '../../../components/Form/TextInput';
 import * as RootNavigation from '../../../navigation/RootNavigation';
 import { loginSuccess } from '../redux/actions';
 import { updateUserInfo } from '../../user/redux/actions';
+import { globalStyles } from '../../../shared/globalStyles';
 
 const Register = () => {
 
@@ -61,7 +62,7 @@ const Register = () => {
     }
 
     return (
-        <Layout style={styles.container}>
+        <Layout style={globalStyles.container}>
 
             <Layout style={styles.layout}>
                 <Text category='h3'>Register Screen</Text>
@@ -88,8 +89,17 @@ const Register = () => {
                     setInputs={setInputs}
                     inputs={inputs}
                 />
-                <Button onPress={registerHandler}>Register</Button>
-                <Text category='p2' onPress={navigateHandler}>Already have account - Let's Login</Text>
+                <Button
+                    style={styles.button}
+                    onPress={registerHandler}
+                >
+                    Register</Button>
+                <Text
+                    style={styles.text}
+                    category='p2'
+                    onPress={navigateHandler}
+                >
+                    Already have account - Let's Login</Text>
             </Layout>
 
         </Layout>
@@ -97,9 +107,6 @@ const Register = () => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     layout: {
         flex: 1,
         justifyContent: 'center',
@@ -108,6 +115,12 @@ const styles = StyleSheet.create({
     form: {
         flex: 4,
         alignItems: 'center',
+    },
+    button: {
+        marginTop: 5
+    },
+    text: {
+        marginTop: 5
     }
 });
 
