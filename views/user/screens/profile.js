@@ -9,7 +9,7 @@ import BigAvatar from '../../../components/Profile/BigAvatar';
 const Profile = () => {
     const user = useSelector(state => state.user.user);
     const navigation = useNavigation();
-    const avatar = user.avatar || require('../../../asserts/images/default-avatar.png');
+    const avatar = { uri: user.avatar } || require('../../../asserts/images/default-avatar.png');
 
     const editHandler = () => {
         navigation.navigate('Edit Profile');

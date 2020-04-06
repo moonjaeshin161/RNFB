@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
-import { Layout, Text, Button } from '@ui-kitten/components'
+import { Layout, Text, Button, Spinner } from '@ui-kitten/components'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserInfo } from '../redux/actions';
 import ImagePicker from 'react-native-image-picker';
-import { uploadPhoto } from '../../../firebase/service';
+
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 
 import TextInput from '../../../components/Form/TextInput'
 import BigAvatar from '../../../components/Profile/BigAvatar';
@@ -15,23 +17,83 @@ import { globalStyles } from '../../../shared/globalStyles';
 const EditProfile = () => {
     const user = useSelector(state => state.user.user);
 
-    const [inputs, setInputs] = useState({ displayName: '' });
-    const [imageURI, setImageURI] = useState(require('../../../asserts/images/default-avatar.png'));
+    const [inputs, setInputs] = useState({ displayName: user.displayName });
+    const [imageURI, setImageURI] = useState(user.avatar ? { uri: user.avatar } : require('../../../asserts/images/default-avatar.png'));
+    const [isChanged, setIsChanged] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
     const editHandler = async () => {
+
         const currentUser = auth().currentUser;
-        currentUser.updateProfile({ displayName: inputs.displayName, avatar: imageURI })
-            .then(() => {
-                uploadPhoto(imageURI.uri);
-                dispatch(updateUserInfo({ displayName: inputs.displayName, avatar: imageURI }));
-                navigation.goBack();
+
+        if (isChanged) {
+            setIsLoading(true);
+            const fileExtension = await imageURI.uri.split('.').pop();
+            const fileName = `${currentUser.uid}.${fileExtension}`;
+
+            const storageRef = storage().ref(`users/avatar/${fileName}`);
+
+            storageRef.putFile(imageURI.uri)
+                .on(
+                    storage.TaskEvent.STATE_CHANGED,
+                    snapshot => {
+                        console.log('Snapshot: ', snapshot.state);
+
+                        if (snapshot.state === storage.TaskState.SUCCESS) {
+                            console.log('Success')
+                        }
+                    },
+                    error => {
+                        unsubscribe();
+                        console.log('Image upload error: ', error.toString());
+                    },
+                    () => {
+                        storageRef.getDownloadURL()
+                            .then(downloadURL => {
+                                console.log('File available at: ', downloadURL);
+                                currentUser.updateProfile({
+                                    displayName: inputs.displayName,
+                                    photoURL: downloadURL
+                                });
+                                dispatch(updateUserInfo({ displayName: inputs.displayName, avatar: downloadURL }));
+                                firestore()
+                                    .collection('users')
+                                    .doc(currentUser.uid)
+                                    .update({
+                                        avatar: downloadURL,
+                                        displayName: inputs.displayName
+                                    })
+                            })
+                            .then(() => {
+                                setIsLoading(false);
+                                navigation.goBack();
+                            })
+                    }
+                );
+        }
+        else {
+            setIsLoading(true);
+            currentUser.updateProfile({
+                displayName: inputs.displayName,
+            }).then(() => {
+                dispatch(updateUserInfo({ displayName: inputs.displayName }));
+                firestore()
+                    .collection('users')
+                    .doc(currentUser.uid)
+                    .update({
+                        displayName: inputs.displayName
+                    }).then(() => {
+                        setIsLoading(false);
+                        navigation.goBack();
+                    })
             })
+        }
     }
 
     const pickImageHandler = () => {
-        ImagePicker.showImagePicker({ title: 'Image upload', maxHeight: 800, maxWidth: 600 }
+        ImagePicker.showImagePicker({ title: 'Image upload', maxHeight: 400, maxWidth: 300 }
             , (response) => {
                 if (response.didCancel) {
                     console.log('User cancelled image picker');
@@ -41,6 +103,7 @@ const EditProfile = () => {
                     console.log('User tapped custom button: ', response.customButton);
                 } else {
                     setImageURI({ uri: response.uri });
+                    setIsChanged(true);
                     // You can also display the image using data:
                     // const source = { uri: 'data:image/jpeg;base64,' + response.data };
 
@@ -50,36 +113,39 @@ const EditProfile = () => {
 
     return (
         <Layout style={globalStyles.container}>
-            {console.log('Edit Profile', user)}
-            <Layout style={styles.title}>
-                <Text category='h3'>Profile Editing</Text>
-            </Layout>
-            <Layout style={styles.content}>
-                <Layout>
-                    <TouchableOpacity onPress={pickImageHandler}>
-                        <BigAvatar source={imageURI} />
-                    </TouchableOpacity>
-                </Layout>
-                <Layout style={styles.row}>
-                    <Text
-                        style={styles.label}
-                        category='s1'
-                    >
-                        Displayname</Text>
-                    <TextInput
-                        placeholder={user.displayName}
-                        inputs={inputs}
-                        setInputs={setInputs}
-                        name='displayName'
-                    />
-                </Layout>
+            {
+                isLoading ? <Spinner size='giant' /> :
+                    <>
+                        <Layout style={styles.title}>
+                            <Text category='h3'>Profile Editing</Text>
+                        </Layout>
+                        <Layout style={styles.content}>
+                            <Layout>
+                                <TouchableOpacity onPress={pickImageHandler}>
+                                    <BigAvatar source={imageURI} />
+                                </TouchableOpacity>
+                            </Layout>
+                            <Layout style={styles.row}>
+                                <Text
+                                    style={styles.label}
+                                    category='s1'
+                                >
+                                    Displayname</Text>
+                                <TextInput
+                                    inputs={inputs}
+                                    setInputs={setInputs}
+                                    name='displayName'
+                                    value={inputs.displayName}
+                                />
+                            </Layout>
 
 
-            </Layout>
-            <Layout style={styles.footer}>
-                <Button onPress={editHandler}>Edit</Button>
-            </Layout>
-
+                        </Layout>
+                        <Layout style={styles.footer}>
+                            <Button onPress={editHandler}>Edit</Button>
+                        </Layout>
+                    </>
+            }
         </Layout>
     )
 }
