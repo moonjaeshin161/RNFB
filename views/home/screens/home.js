@@ -14,7 +14,8 @@ const Home = () => {
 
     function onAuthStateChanged(user) {
         setUser(user);
-        dispatch(setUserInfo({ email: user.email, displayName: user.displayName }));
+        console.log('Home: ', user)
+        dispatch(setUserInfo({ email: user.email, displayName: user.displayName, avatar: user.photoURL }));
         if (initializing) setInitializing(false);
     }
     useEffect(() => {

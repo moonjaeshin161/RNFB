@@ -45,7 +45,7 @@ const Login = () => {
     return (
         <Layout style={globalStyles.container}>
             {
-                loading ? <Spinner size='giant' style={styles.spinner} /> :
+                loading ? <Spinner size='giant' /> :
                     <>
                         <Layout style={styles.layout}>
                             <Text category='h3'>Login Screen</Text>
@@ -86,7 +86,6 @@ const Login = () => {
 }
 
 const styles = StyleSheet.create({
-
     layout: {
         flex: 1,
         justifyContent: 'center',
