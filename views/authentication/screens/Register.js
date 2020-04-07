@@ -35,7 +35,7 @@ const Register = () => {
                             displayName: inputs.displayName
                         });
                         await firestore()
-                            .collection('users')
+                            .collection('Users')
                             .doc(currentUser.uid)
                             .set({
                                 email: inputs.email,
