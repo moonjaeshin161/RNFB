@@ -59,7 +59,7 @@ const EditProfile = () => {
                                 });
                                 dispatch(updateUserInfo({ displayName: inputs.displayName, avatar: downloadURL }));
                                 firestore()
-                                    .collection('users')
+                                    .collection('Users')
                                     .doc(currentUser.uid)
                                     .update({
                                         avatar: downloadURL,
@@ -80,7 +80,7 @@ const EditProfile = () => {
             }).then(() => {
                 dispatch(updateUserInfo({ displayName: inputs.displayName }));
                 firestore()
-                    .collection('users')
+                    .collection('Users')
                     .doc(currentUser.uid)
                     .update({
                         displayName: inputs.displayName
