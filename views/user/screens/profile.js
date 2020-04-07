@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Layout, Text, Button } from '@ui-kitten/components';
 import { useSelector } from 'react-redux'
 import { StyleSheet } from 'react-native';
@@ -9,11 +9,17 @@ import BigAvatar from '../../../components/Profile/BigAvatar';
 const Profile = () => {
     const user = useSelector(state => state.user.user);
     const navigation = useNavigation();
-    const avatar = { uri: user.avatar } || require('../../../asserts/images/default-avatar.png');
+    const [avatar, setAvatar] = useState(user.avatar ? { uri: user.avatar } : require('../../../asserts/images/default-avatar.png'));
 
     const editHandler = () => {
         navigation.navigate('Edit Profile');
     }
+
+    useEffect(() => {
+        if (user.avatar) {
+            setAvatar({ uri: user.avatar })
+        }
+    }, [user]);
 
     return (
         <Layout style={globalStyles.container}>
