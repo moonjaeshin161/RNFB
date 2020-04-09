@@ -20,7 +20,7 @@ import { globalStyles } from '../../../shared/globalStyles';
 const Login = () => {
 
     const [inputs, setInputs] = useState({ email: '', password: '' });
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
     const navigation = useNavigation();

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "675303672629",
+    "firebase_url": "https://react-native-firebase-f3342.firebaseio.com",
+    "project_id": "react-native-firebase-f3342",
+    "storage_bucket": "react-native-firebase-f3342.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675303672629:android:2a669659ea3a3d001ada7c",
+        "android_client_info": {
+          "package_name": "com.appchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675303672629-8cqr1i87qc9nkreni2oqm7umov6lgdpo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqAy-qdsr89QsfFH8S86grNyixmJEEasg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675303672629-8cqr1i87qc9nkreni2oqm7umov6lgdpo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "675303672629-vhtp0acbf2ig9fkfviha89v23ujc0um9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.appChat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
