@@ -13,7 +13,7 @@ const Home = () => {
     const dispatch = useDispatch();
 
     function onAuthStateChanged(user) {
-        dispatch(setUserInfo({ email: user.email, displayName: user.displayName, avatar: user.photoURL }));
+        dispatch(setUserInfo({ email: user.email, displayName: user.displayName, avatar: user.photoURL, uid: user.uid }));
         if (initializing) setInitializing(false);
     }
     useEffect(() => {

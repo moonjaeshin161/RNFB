@@ -1,10 +1,10 @@
 export const types = {
-    GET_ROOM_LIST: 'GET_ROOM_LIST',
+    GET_USER_LIST: 'GET_USER_LIST',
 }
 
-export function getRoomList(rooms) {
+export function getUserList(user) {
     return {
-        type: types.GET_ROOM_LIST,
-        payload: rooms
+        type: types.GET_USER_LIST,
+        payload: user
     }
 }

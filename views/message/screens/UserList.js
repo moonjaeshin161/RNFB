@@ -1,67 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Layout, Text, List, ListItem, Button } from '@ui-kitten/components';
 import { globalStyles } from '../../../shared/globalStyles';
 import { StyleSheet } from 'react-native';
-import TextInput from '../../../components/Form/TextInput';
 
 import firestore from '@react-native-firebase/firestore';
 import { useSelector, useDispatch } from 'react-redux';
-import { getRoomList } from '../redux/action';
+import { useNavigation } from '@react-navigation/native';
+import { getUserList } from '../redux/action';
 
-const RoomList = () => {
+const UserList = () => {
 
-    const [inputs, setInputs] = useState({ roomName: '' });
-    const rooms = useSelector(state => state.message.rooms);
+    const users = useSelector(state => state.message.users);
     const dispatch = useDispatch();
+    const navigation = useNavigation();
+
+    const navigateChat = (index) => {
+        navigation.navigate('Chat', index);
+    }
 
     const renderItem = ({ item }) => (
-        <ListItem title={`${item.name}`} />
+        <ListItem title={`${item.displayName}`} onPress={(index) => navigateChat(index)} />
     );
-
-    const addHandler = () => {
-        if (inputs.roomName !== '') {
-            firestore()
-                .collection('Rooms')
-                .add({
-                    name: inputs.roomName
-                })
-        }
-    }
 
     useEffect(() => {
         const subscriber = firestore()
-            .collection('Rooms')
+            .collection('Users')
             .onSnapshot(snapshot => {
                 let changes = snapshot.docChanges();
                 changes.forEach((change) => {
                     if (change.type === 'added') {
                         { console.log('ID: ', change.doc.id) }
-                        dispatch(getRoomList(change.doc.data()));
+                        dispatch(getUserList(change.doc.data()));
                     }
                 })
             });
 
         // Stop listening for updates when no longer required
         return () => subscriber();
-    }, [rooms.id]);
+    }, []);
 
     return (
         <Layout style={globalStyles.container}>
 
             <Layout style={styles.title}>
+
                 <Text category='h3'>Room List</Text>
-                <Button onPress={addHandler}>Add</Button>
-                <TextInput
-                    value={inputs.roomName}
-                    setInputs={setInputs}
-                    inputs={inputs}
-                    name='roomName'
-                />
             </Layout>
 
             <Layout style={styles.content}>
                 <List
-                    data={rooms}
+                    data={users}
                     renderItem={renderItem}
                 />
             </Layout>
@@ -82,4 +70,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default RoomList
+export default UserList;
